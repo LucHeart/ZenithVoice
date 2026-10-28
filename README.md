@@ -29,10 +29,21 @@ which is the proxy. The plugin rewrites that packet so voice works:
   proxy. When that changes the old one is disconnected from voice; the new one connects once the server
   drops the old connection (~10s).
 
+## Install
+Download the jar matching your ZenithProxy MC version (check with the `status` command) from the releases,
+e.g. `ZenithVoice-1.0.0+26.3.0.jar`. Put it in the `plugins/` folder next to the Zenith launcher and restart.
+Requires the `java` release channel. 1.21.4 builds run on Java 21, 26.x builds need Java 25.
+
 ## Build
-1. Set `mc` in `gradle.properties` to your ZenithProxy MC version (check with the `status` command or your launcher config).
-2. `./gradlew build` → jar in `build/libs/`
-3. Put the jar in the `plugins/` folder next to the Zenith launcher, restart. Requires the `java` release channel.
+`./gradlew build -Pmc=26.3.0` → `build/libs/ZenithVoice-<version>+<mc>.jar`. Without `-Pmc` it uses `mc` from
+`gradle.properties`. Supported versions are listed in `mc_versions`; `zenith_version` picks the ZenithProxy release
+to compile against (`snapshot` for the latest `<mc>-SNAPSHOT`).
+
+## CI
+GitHub Actions (`.github/workflows/build.yml`) builds a jar for every version in `mc_versions` on each push and
+pull request; the jars are attached to the run. Pushing a semver tag like `1.0.0` (no `v`) also creates a draft
+GitHub release with all jars, to publish by hand. The tag has to match `plugin_version` in `gradle.properties`,
+otherwise the release step fails.
 
 ## Commands
 - `zenithVoice on/off` (alias `zv`)
