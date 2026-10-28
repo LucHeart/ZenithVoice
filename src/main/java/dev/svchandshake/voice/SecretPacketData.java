@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  * Payload of Simple Voice Chat's voicechat:secret packet. Only the fields that decide where the
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
  * </pre>
  */
 public final class SecretPacketData {
+    public static final int SECRET_SIZE = 16;
     private static final int PORT_OFFSET = 16;
     private static final int HOST_OFFSET = 16 + 4 + 16 + 1 + 4 + 8 + 4 + 1;
 
@@ -21,6 +23,10 @@ public final class SecretPacketData {
     private final int hostEnd;
     public final int serverPort;
     public final String voiceHost;
+
+    public byte[] secret() {
+        return Arrays.copyOf(data, SECRET_SIZE);
+    }
 
     private SecretPacketData(byte[] data, int hostEnd, int serverPort, String voiceHost) {
         this.data = data;
@@ -41,6 +47,11 @@ public final class SecretPacketData {
 
     /** Copy of the packet with serverPort and voiceHost replaced. */
     public byte[] withAddress(int port, String host) {
+        return withAddress(port, host, null);
+    }
+
+    /** Copy of the packet with serverPort, voiceHost and, if not null, the secret replaced. */
+    public byte[] withAddress(int port, String host, byte[] secret) {
         byte[] hostBytes = host.getBytes(StandardCharsets.UTF_8);
         var out = new ByteArrayOutputStream(data.length + hostBytes.length);
         out.write(data, 0, HOST_OFFSET);
@@ -49,6 +60,7 @@ public final class SecretPacketData {
         out.write(data, hostEnd, data.length - hostEnd);
         byte[] result = out.toByteArray();
         ByteBuffer.wrap(result).putInt(PORT_OFFSET, port);
+        if (secret != null) System.arraycopy(secret, 0, result, 0, SECRET_SIZE);
         return result;
     }
 
@@ -78,7 +90,7 @@ public final class SecretPacketData {
         }
     }
 
-    private static int readVarInt(ByteBuffer buf) {
+    static int readVarInt(ByteBuffer buf) {
         int value = 0;
         for (int shift = 0; shift < 35; shift += 7) {
             byte b = buf.get();
@@ -88,7 +100,7 @@ public final class SecretPacketData {
         throw new IllegalArgumentException("VarInt too big");
     }
 
-    private static void writeVarInt(ByteArrayOutputStream out, int value) {
+    static void writeVarInt(ByteArrayOutputStream out, int value) {
         while ((value & ~0x7F) != 0) {
             out.write((value & 0x7F) | 0x80);
             value >>>= 7;

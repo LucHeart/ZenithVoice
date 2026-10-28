@@ -29,9 +29,14 @@ public class VoiceChatHandshakeCommand extends Command {
                 Version 18 = SVC 2.5.x, 20 = SVC 2.6.x. With autoProbe on, the working version is detected and saved.
                 
                 voice: how a player connected to the proxy gets voice chat.
-                relay = UDP goes through the proxy on relayPort (open that UDP port).
-                direct = the client connects straight to the server's voice port.
+                relay = UDP goes through the proxy on relayPort (open that UDP port). Everyone hears,
+                the controlling player talks (or the first spectator in voice if there is none).
+                direct = the client connects straight to the server's voice port. Only the controlling
+                player, or a spectator alone on the proxy, gets voice.
                 off = untouched, voice usually won't connect.
+                
+                keepListening (relay): spectators keep hearing while the controlling player has voice
+                chat disabled. Off = the controlling player disabling voice cuts it for everyone.
                 """)
             .usageLines(
                 "on/off",
@@ -42,7 +47,8 @@ public class VoiceChatHandshakeCommand extends Command {
                 "relayPort <port>",
                 "relayHost <host>",
                 "relayHost clear",
-                "spectatorVoice on/off"
+                "spectatorVoice on/off",
+                "keepListening on/off"
             )
             .aliases("svc")
             .build();
@@ -90,6 +96,11 @@ public class VoiceChatHandshakeCommand extends Command {
             .then(literal("spectatorVoice").then(argument("toggle", toggle()).executes(c -> {
                 PLUGIN_CONFIG.spectatorVoice = getToggle(c, "toggle");
                 c.getSource().getEmbed().title("Spectator Voice " + toggleStrCaps(PLUGIN_CONFIG.spectatorVoice));
+            })))
+            .then(literal("keepListening").then(argument("toggle", toggle()).executes(c -> {
+                PLUGIN_CONFIG.keepListening = getToggle(c, "toggle");
+                MODULE.get(VoiceChatHandshakeModule.class).refreshDisabledState();
+                c.getSource().getEmbed().title("Keep Listening " + toggleStrCaps(PLUGIN_CONFIG.keepListening));
             })));
     }
 
@@ -110,6 +121,7 @@ public class VoiceChatHandshakeCommand extends Command {
             .addField("Voice Mode", PLUGIN_CONFIG.voiceMode.name().toLowerCase())
             .addField("Relay", PLUGIN_CONFIG.relayPort + " (" + (MODULE.get(VoiceChatHandshakeModule.class).isRelayRunning() ? "running" : "stopped") + ")")
             .addField("Relay Host", PLUGIN_CONFIG.relayPublicHost.isEmpty() ? "proxy address" : PLUGIN_CONFIG.relayPublicHost)
-            .addField("Spectator Voice", toggleStr(PLUGIN_CONFIG.spectatorVoice));
+            .addField("Spectator Voice", toggleStr(PLUGIN_CONFIG.spectatorVoice))
+            .addField("Keep Listening", toggleStr(PLUGIN_CONFIG.keepListening));
     }
 }

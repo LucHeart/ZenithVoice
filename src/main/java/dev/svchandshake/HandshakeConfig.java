@@ -25,6 +25,12 @@ public class HandshakeConfig {
     public String relayPublicHost = "";
     /** Give spectators the account's voice secret too, so they speak and hear as the account. */
     public boolean spectatorVoice = true;
+    /**
+     * Relay mode: the server only gets "voice disabled" once every client on the proxy has disabled it,
+     * so spectators keep hearing while the controlling player has voice off. Off = the controlling
+     * player's setting goes straight to the server, like plain SVC.
+     */
+    public boolean keepListening = false;
 
     public enum VoiceMode {
         /** Don't touch the secret packet. */

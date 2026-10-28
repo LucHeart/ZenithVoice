@@ -13,8 +13,14 @@ which is the proxy. The plugin rewrites that packet so voice works:
 - `relay` (default): voice UDP goes through the proxy on `relayPort` (24454). Open/forward that UDP port
   on the proxy host (and in Docker: `-p 24454:24454/udp`). The server only ever sees the proxy's IP, and
   reconnecting to the proxy keeps working because the server always sees the same source address.
+  Everyone on the proxy (player and spectators) hears voice chat. Only one of them talks: the controlling
+  player, or if they aren't in voice or have voice chat disabled, the spectator who joined voice first.
+  A mic mute (as opposed to disabling voice chat) never leaves the client, so a controlling player who
+  only muted their mic still keeps the talking slot.
 - `direct`: your client connects straight to the server's voice port. No port to open, but the server sees
-  your real IP, and after reconnecting it can take a bit until the server drops the old voice connection.
+  your real IP. Only one client can have voice: the controlling player, or a spectator who is alone on the
+  proxy. When that changes the old one is disconnected from voice; the new one connects once the server
+  drops the old connection (~10s).
 
 ## Build
 1. Set `mc` in `gradle.properties` to your ZenithProxy MC version (check with the `status` command or your launcher config).
@@ -30,8 +36,11 @@ which is the proxy. The plugin rewrites that packet so voice works:
 - `voiceChatHandshake relayPort <port>`: UDP port the relay listens on
 - `voiceChatHandshake relayHost <host>` / `relayHost clear`: address players use for the relay if it differs
   from the one they connect to the proxy with (e.g. a different domain or IP)
-- `voiceChatHandshake spectatorVoice on/off`: spectators get voice too, speaking and hearing as the proxy account.
-  Only one client can hold the account's voice at a time, so a player and a spectator will fight over it.
+- `voiceChatHandshake spectatorVoice on/off` (default on): spectators get voice too, as the proxy account
+  (see the modes above).
+- `voiceChatHandshake keepListening on/off` (relay, default off): spectators keep hearing while the controlling player has voice
+  chat disabled; the server only sees "disabled" once everyone has it off. Off = plain SVC behaviour, the
+  controlling player disabling voice cuts it for everyone, and spectators can't talk while it's disabled either.
 
 ## AI Disclosure
 Most of this project is made with the help of an LLM. I read over the code fully and deemed it was fair enough and works well.  
