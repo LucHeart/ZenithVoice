@@ -1,4 +1,4 @@
-package dev.svchandshake.module;
+package lucheart.zenithvoice.module;
 
 import com.github.rfresh2.EventConsumer;
 import com.zenith.Proxy;
@@ -14,9 +14,9 @@ import com.zenith.network.client.ClientSession;
 import com.zenith.network.codec.PacketHandlerCodec;
 import com.zenith.network.codec.PacketHandlerStateCodec;
 import com.zenith.network.server.ServerSession;
-import dev.svchandshake.HandshakeConfig.VoiceMode;
-import dev.svchandshake.voice.SecretPacketData;
-import dev.svchandshake.voice.VoiceRelay;
+import lucheart.zenithvoice.ZenithVoiceConfig.VoiceMode;
+import lucheart.zenithvoice.voice.SecretPacketData;
+import lucheart.zenithvoice.voice.VoiceRelay;
 import net.kyori.adventure.key.Key;
 import org.geysermc.mcprotocollib.network.packet.Packet;
 import org.geysermc.mcprotocollib.protocol.data.ProtocolState;
@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.github.rfresh2.EventConsumer.of;
 import static com.zenith.Globals.EXECUTOR;
 import static com.zenith.Globals.saveConfigAsync;
-import static dev.svchandshake.VoiceChatHandshakePlugin.PLUGIN_CONFIG;
+import static lucheart.zenithvoice.ZenithVoicePlugin.PLUGIN_CONFIG;
 
 /**
  * Simple Voice Chat's force_voice_chat check only looks at whether the client sent
@@ -55,7 +55,7 @@ import static dev.svchandshake.VoiceChatHandshakePlugin.PLUGIN_CONFIG;
  * SVC only hands out one secret per login, and the proxy usually asks before a player joins, so the
  * player's own request would be ignored by the server. The secret is kept and answered locally instead.
  */
-public class VoiceChatHandshakeModule extends Module {
+public class ZenithVoiceModule extends Module {
     private static final Key REGISTER = Key.key("minecraft", "register");
     private static final Key REQUEST_SECRET = Key.key("voicechat", "request_secret");
     private static final Key SECRET = Key.key("voicechat", "secret");
@@ -114,7 +114,7 @@ public class VoiceChatHandshakeModule extends Module {
     @Override
     public PacketHandlerCodec registerClientPacketHandlerCodec() {
         return PacketHandlerCodec.clientBuilder()
-            .setId("voicechat-handshake")
+            .setId("zenith-voice")
             .setPriority(1000)
             .state(ProtocolState.GAME, PacketHandlerStateCodec.clientBuilder()
                 .inbound(ClientboundCustomPayloadPacket.class, this::onCustomPayload)
@@ -125,7 +125,7 @@ public class VoiceChatHandshakeModule extends Module {
     @Override
     public PacketHandlerCodec registerServerPacketHandlerCodec() {
         return PacketHandlerCodec.serverBuilder()
-            .setId("voicechat-handshake")
+            .setId("zenith-voice")
             .setPriority(1000)
             .state(ProtocolState.GAME, PacketHandlerStateCodec.serverBuilder()
                 .inbound(ServerboundCustomPayloadPacket.class, this::onPlayerCustomPayload)

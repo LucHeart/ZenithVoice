@@ -1,4 +1,4 @@
-package dev.svchandshake.voice;
+package lucheart.zenithvoice.voice;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;

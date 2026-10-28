@@ -1,4 +1,4 @@
-package dev.svchandshake.voice;
+package lucheart.zenithvoice.voice;
 
 import com.zenith.network.server.ServerSession;
 
@@ -21,7 +21,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static dev.svchandshake.VoiceChatHandshakePlugin.LOG;
+import static lucheart.zenithvoice.ZenithVoicePlugin.LOG;
 
 /**
  * Forwards Simple Voice Chat UDP between the players on the proxy and the backend server.

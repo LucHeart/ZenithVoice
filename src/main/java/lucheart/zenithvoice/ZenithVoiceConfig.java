@@ -1,9 +1,9 @@
-package dev.svchandshake;
+package lucheart.zenithvoice;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HandshakeConfig {
+public class ZenithVoiceConfig {
     public boolean enabled = true;
     /** SVC compatibility version sent first. 18 = SVC 2.5.x, 20 = SVC 2.6.x. Auto-updated when a probe succeeds. */
     public int compatibilityVersion = 20;
